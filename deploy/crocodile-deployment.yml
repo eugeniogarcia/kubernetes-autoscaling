@@ -19,7 +19,10 @@ spec:
           image: pruebacontenedor.azurecr.io/crocodile-api:latest
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 4000    
+            - containerPort: 4000
+          resources:
+            requests:
+              cpu: 200m      
       imagePullSecrets:
         - name: miaks
 ---
