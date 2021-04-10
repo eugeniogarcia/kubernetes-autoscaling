@@ -11,7 +11,7 @@ The best approach is to automate scaling. This can be triggered by monitoring cu
 
 # Kube State Metrics
 
-Información about Kube State Metrics can be seen [here](https://github.com/kubernetes/kube-state-metrics) and [here](https://devopscube.com/setup-kube-state-metrics/).
+InformacÃ³n about Kube State Metrics can be seen [here](https://github.com/kubernetes/kube-state-metrics) and [here](https://devopscube.com/setup-kube-state-metrics/).
 
 Kube State metrics is s service which talks to Kubernetes API server to get all the details about all the API objects like deployments, pods, daemonsets etc. Basically it provides kubernetes API object metrics which you cannot get directly from native Kubernetes monitoring components. Kube state metrics service exposes all the metrics on /metrics URI. Prometheus can scrape all the metrics exposed by kube state metrics.
 
@@ -43,7 +43,7 @@ We can configure Prometheus to scrap the metrics as:
 
 # Prometheus
 
-Información about how to setup Prometheus can be seen [here](https://devopscube.com/setup-prometheus-monitoring-on-kubernetes/).
+InformaciÃ³n about how to setup Prometheus can be seen [here](https://devopscube.com/setup-prometheus-monitoring-on-kubernetes/).
 
 ## Monitoring namespace
 
@@ -55,7 +55,7 @@ kubectl create namespace seguimiento
 
 ## RBAC configuration
 
-You need to assign cluster reader permission to this namespace so that Prometheus can fetch the metrics from Kubernetes API’s.
+You need to assign cluster reader permission to this namespace so that Prometheus can fetch the metrics from Kubernetes APIs.
 
 ```ps
 kubectl create -f .\kubernetes-prometheus\clusterRole.yaml
@@ -421,6 +421,8 @@ The dashboard is shown:
 
 # The Application
 
+## Data exposed 
+
 The application is a nodejs api. We can found it in `server.js`. Lets review it. We are creating a server using the json-server api. It allows us to expose a rest api with the full blown set of http methods based on a json file, a sort of data store. In our case the file is db.json. It contains:
 
 ```json
@@ -444,12 +446,23 @@ The application is a nodejs api. We can found it in `server.js`. Lets review it.
 	(...)
 ```
 
+## Json-server
+
 This will expose the resource `crocodiles` with the different methods get, post, put, ... For example `GET /crocodiles` will list the contents of the file, `GET /crocodiles/1` will list the first item, `POST /crocodiles` will insert a new object, etc. The json-server could be run in stand alone, and has [many other options](https://www.npmjs.com/package/json-server). In our case we will use it to create a nodejs app. We create a server using:
 
 ```js
 const jsonServer = require('json-server');
 const app = jsonServer.create();
 ```
+
+We the following command we are adding all the default middlewares - logger, static, cors and no-cache:
+
+```js
+const middlewares = jsonServer.defaults()
+app.use(middlewares);
+```
+
+## Metrics. Prometheus
 
 We are going to instrument the app in prometheus. We could leverage many libraries to integrate our app with prometheus, we will rely on the `@tailorbrands/node-exporter-prometheus` library:
 
@@ -472,21 +485,20 @@ app.use(promExporter.middleware);
 app.get('/metrics', promExporter.metrics);
 ```
 
-We expose the json server as a middleware. This will add to our nodejs app all the resources available in db.json, and with all the http verbs:
+## Routes/Middlewares
 
-```js
-const middlewares = jsonServer.defaults()
-app.use(middlewares);
-```
-
-We also create a custom middleware to introduce a delay in the requests made to the crocodiles resource:
+First we create a middleware that will introduce a ramdom delay in requests mades as a _get_ to _/crocodiles_. Notice how the callback in the _setTimeout_ is a call to _next_:
 
 ```js
 app.use('/crocodiles', function (req, res, next) {
   let delay = Math.floor(Math.random() * (maxDelay - minDelay)) + minDelay;
   setTimeout(next, delay)
 });
+```
 
+Then we also add all the routes/midlewares provided by the _Json-server_ based on the data we are to expose:
+
+```js
 const router = jsonServer.router('db.json');
 app.use(router);
 ```
@@ -533,7 +545,7 @@ docker push pruebacontenedor.azurecr.io/crocodile-api:latest
 
 ## Deploy the app
 
-We can now deploy the app to Kubernetes. First we´ll create the credentials to pull the image from the Azure registry:
+We can now deploy the app to Kubernetes. First we'll create the credentials to pull the image from the Azure registry:
 
 ```ps
 kubectl create secret docker-registry miaks --namespace default --docker-server=pruebacontenedor.azurecr.io --docker-username=pruebacontenedor --docker-password=Pr0bDGtfdIKbWj+pGbGEsFpc8D/3enAH
