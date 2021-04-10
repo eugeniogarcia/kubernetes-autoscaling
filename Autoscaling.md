@@ -395,7 +395,7 @@ User: admin
 Pass: admin
 ```
 
-## Setup Kubernetes Dashbaords
+## Setup Kubernetes Dashboards
 
 There are many prebuilt Grafana templates available for various data sources. You can [check out the templates from here](https://grafana.com/grafana/dashboards?search=kubernetes&orderBy=name&direction=asc).
 
@@ -419,6 +419,9 @@ The dashboard is shown:
 
 ![Step5](./imagenes/Step5.png)
 
+## Nota
+
+The following dashboards look nice: 8588, 315, and 1621. 
 # The Application
 
 ## Data exposed 
