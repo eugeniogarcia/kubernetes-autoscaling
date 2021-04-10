@@ -648,7 +648,7 @@ We can read more about k6 [here](https://k6.io/docs/getting-started/running-k6).
 
 We have a couple of stress tests in two k6 load test configurations:
 
-- The first option is a quick 3 minute load test you can use to quickly confirm metrics are being captured
+- The first option is a quick 3 minute load test you can use to quickly confirm metrics are being captured (other options can be seen [here](https://k6.io/docs/using-k6/options/))
 
 ```js
 export let options = {
